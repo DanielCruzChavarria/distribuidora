@@ -9,6 +9,7 @@ Antes de comenzar, asegúrate de tener lo siguiente instalado en tu máquina:
 - **Java Development Kit (JDK)** 17.
 - **Maven** (versión 3.6.3 o superior)
 - **Git** para clonar el repositorio.
+- **MySQL** 
 
 ## Instalación
 
@@ -43,14 +44,14 @@ mvn clean install
 
 
 1. Crear una base de datos:
-
+   Se incluye un script de muestra para correr la base de datos con algunos datos precargados.
+   **inventario_db.sql**
     ```sql
     CREATE DATABASE inventario_bd;
     ```
 
 2. Configurar las propiedades de conexión en `src/main/resources/application.properties`:
 
-   Se incluye un script de muestra para correr la base de datos con algunos datos precargados.
 
     ```properties
     spring.datasource.url=jdbc:mysql://localhost:3306/inventario_bd
