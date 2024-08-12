@@ -1,0 +1,89 @@
+<div class="mb-5 mt-2" th:fragment="page">
+    <form th:action="@{/productos/list}" method="get">
+        <div class="row justify-content-between">
+            <div class="col-4 form-group">
+                <label for="clave">Clave</label>
+                <input type="text" class="form-control" placeholder="Ingresa Clave" name="clave" id="clave">
+            </div>
+            <div class="col-4 form-group">
+                <label for="tipo_producto_slc">Tipo de Producto</label>
+                <select class="form-select" name="tipoProducto" id="tipo_producto_slc" >
+                    <option th:each="tProducto : ${tipoProducto}" th:value="${tProducto.id}" th:text="${tProducto.nombre}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-2 justify-content-end">
+            <div class="col-auto ">
+                <button class="btn btn-primary" type="submit">Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Editar</th>
+                <th>Nombre</th>
+                <th>Clave</th>
+                <th>Precio</th>
+                <th>Tipo de Producto</th>
+                <th>Eliminar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(productos)}">
+                <td colspan="5" class="text-center">No hay productos para mostrar.</td>
+            </tr>
+            <tr th:each="producto : ${productos}">
+                <td><a th:href="@{/productos/{id}(id=${producto.id})}">
+                    <i class="bi bi-pencil text-warning "></i>
+                </a></td>
+                <td th:text="${producto.nombre}"></td>
+                <td th:text="${producto.clave}"></td>
+                <td th:text="${#numbers.formatCurrency(producto.precio)}"></td>
+                <td th:text="${producto.tipoProducto.nombre}"></td>
+                <td>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                       th:data-product-id="${producto.id}"
+                       th:onclick="'setProductId(' + ${producto.id} + ')'">
+                        <i class="bi bi-trash3-fill text-danger"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-auto ">
+            <a th:href="@{/productos/create}" class="btn btn-sm btn-success" type="button">Agregar Producto</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro que deseas eliminar este producto?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="get">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setProductId(productId) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/productos/delete/${productId}`;
+    }
+</script>

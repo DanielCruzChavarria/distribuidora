@@ -1,0 +1,172 @@
+<form th:fragment="page" th:action="@{/productos/save}" method="post" th:object="${producto}" id="productForm">
+    <input type="hidden" th:field="*{id}"/>
+    <div class="container">
+        <div class="row justify-content-around">
+            <div class="col-2">
+                <label for="clave">Clave</label>
+                <input class="form-control" type="text" name="clave" id="clave" th:field="*{clave}" required>
+                <div th:if="${#fields.hasErrors('clave')}" class="text-danger">
+                    <p th:each="err : ${#fields.errors('clave')}" th:text="${err}"></p>
+                </div>
+            </div>
+            <div class="col-2">
+                <label for="precio">Precio</label>
+                <input class="form-control" type="number" name="precio" id="precio" th:field="*{precio}" required>
+                <div th:if="${#fields.hasErrors('precio')}" class="text-danger">
+                    <p th:each="err : ${#fields.errors('precio')}" th:text="${err}"></p>
+                </div>
+            </div>
+            <div class="col-3">
+                <label for="nombre">Nombre</label>
+                <input class="form-control" type="text" name="nombre" id="nombre" th:field="*{nombre}" required>
+                <div th:if="${#fields.hasErrors('nombre')}" class="text-danger">
+                    <p th:each="err : ${#fields.errors('nombre')}" th:text="${err}"></p>
+                </div>
+            </div>
+            <div class="col-3">
+                <label for="tipoProducto">Tipo Producto</label>
+                <select class="form-select" name="tipoProducto.id" id="tipoProducto" th:field="*{tipoProducto.id}" required>
+                    <option value="" disabled th:if="${#lists.isEmpty(tipoProducto)}">Seleccione un tipo de producto</option>
+                    <option th:each="tProducto : ${tipoProducto}"
+                            th:value="${tProducto.id}"
+                            th:text="${tProducto.nombre}"
+                            th:selected="${tProducto.id == producto.tipoProducto?.id}"></option>
+
+                </select>
+
+                <div th:if="${#fields.hasErrors('tipoProducto')}" class="text-danger">
+                    <p th:each="err : ${#fields.errors('tipoProducto')}" th:text="${err}"></p>
+                </div>
+            </div>
+            <div class="col-2 align-content-center">
+                <label class="form-check-label" for="active">Activo</label>
+                <input class="form-check-input" type="checkbox" name="active" id="active" th:field="*{active}">
+                <div th:if="${#fields.hasErrors('active')}" class="text-danger">
+                    <p th:each="err : ${#fields.errors('active')}" th:text="${err}"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2 justify-content-end">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary" th:text="${producto.id} != null ? 'Actualizar' : 'Guardar'"></button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div class="container">
+    <div class="row">
+        <table class="table" id="proveedoresTable">
+            <thead>
+            <tr>
+                <th>Editar</th>
+                <th>Proveedor</th>
+                <th>Clave Producto</th>
+                <th>Costo</th>
+                <th>Eliminar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Mensaje cuando el producto no está asociado -->
+            <tr th:if="${proveedorProducto == null}">
+                <td colspan="5" class="text-center">Por favor agrega el producto antes de ingresar proveedores.</td>
+            </tr>
+
+            <!-- Mensaje cuando el producto está asociado pero no hay proveedores -->
+            <tr th:if="${proveedorProducto != null && #lists.isEmpty(proveedoresProducto)}">
+                <td colspan="5" class="text-center">Ingresa un proveedor para este producto.</td>
+            </tr>
+
+
+            <tr th:each="proveedorProducto, iterStat : ${proveedoresProducto}">
+                <td>
+                    <a href="#"
+                       class="edit-btn"
+                       th:data-id="${proveedorProducto.id}"
+                       th:data-proveedor-id="${proveedorProducto.proveedor.id}"
+                       th:data-nombre="${proveedorProducto.proveedor?.nombre}"
+                       th:data-clave="${proveedorProducto.claveProveedor}"
+                       th:data-costo="${proveedorProducto.costo}">
+                        <i class="bi bi-pencil text-warning "></i>
+                    </a>
+                </td>
+                <td th:text="${proveedorProducto.proveedor?.nombre}"></td>
+                <td th:text="${proveedorProducto.claveProveedor}"></td>
+                <td th:text="${#numbers.formatCurrency(proveedorProducto.costo)}"></td>
+                <td>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                       th:data-product-id="${proveedorProducto.id}"><i class="bi bi-trash3-fill text-danger"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row mt-2 justify-content-end" th:if="${proveedorProducto != null}">
+        <div class="col-auto">
+            <a href="#"  class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#proveedorModal">Agregar Proveedor</a>
+        </div>
+    </div>
+
+
+</div>
+<!-- Add Modal -->
+<div class="modal fade" id="proveedorModal" tabindex="-1" aria-labelledby="proveedorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content"  th:if="${proveedorProducto}">
+            <form id="proveedorForm" th:action="@{/proveedorProducto/saveProveedor}" method="post" th:object="${proveedorProducto}">
+                <input type="hidden" th:field="*{id}" id="proveedorProductoId"/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="proveedorModalLabel">Agregar/Editar Proveedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="producto" name="producto" th:value="${producto}" th:field="*{producto}">
+
+                    <div class="mb-3">
+                        <label for="proveedorId" class="form-label">Proveedor</label>
+                        <select class="form-select" id="proveedorId" name="proveedorId" th:field="*{proveedor}" required>
+                            <option value="" disabled selected>Seleccione un proveedor</option>
+                            <option th:each="proveedor : ${proveedor}" th:value="${proveedor.id}" th:text="${proveedor.nombre}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="claveProveedor" class="form-label">Clave Proveedor</label>
+                        <input type="text" class="form-control" id="claveProveedor" name="claveProveedor" th:field="*{claveProveedor}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="costo" class="form-label">Costo</label>
+                        <input type="number" class="form-control" id="costo" name="costo" th:field="*{costo}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro que deseas eliminar este proveedor?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="get" >
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/proveedor.js}"></script>
