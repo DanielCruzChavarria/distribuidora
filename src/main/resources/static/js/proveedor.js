@@ -6,7 +6,6 @@
 
     editButtons.forEach(button => {
         button.addEventListener('click', function (event) {
-        alert("CALLING")
             event.preventDefault();
             const proveedorId = this.getAttribute('data-proveedor-id');
             const proveedorProductoId = this.getAttribute('data-id');
@@ -27,10 +26,8 @@
     deleteButtons.forEach(button => {
         button.addEventListener('click', function (event) {
             event.preventDefault();
-            alert("CLick");
 
             const productId = this.getAttribute('data-product-id');
-            console.log("Si hay producto", productId);
             if(productId){
                 deleteForm.action = `/proveedorProducto/delete/${productId}`;
                 deleteModal.show();
